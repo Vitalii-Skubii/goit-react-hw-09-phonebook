@@ -1,30 +1,32 @@
 import PropTypes from 'prop-types';
+import { useCallback } from 'react-dom';
 import styles from './ContactList.module.css';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // import contactsOperations from '../../redux/contacts/contacts-operations';
 // import contactsSelectors from '../../redux/contacts/contacts-selectors';
 import { contactsOperations, contactsSelectors } from '../../redux/contacts';
-const ContactItem = ({ id, name, number, onRemove }) => {
-  return (
-    <li className={styles.listItem} key={id}>
-      {name}: {number}{' '}
-      <button className={styles.btn} onClick={() => onRemove(id)}>
-        Delete
-      </button>
-    </li>
-  );
-};
 
-const ContactList = ({ contacts, onRemove }) => {
+export default function ContactList() {
+  const contacts = useSelector(contactsSelectors.getVisibleContacts);
+  const dispatch = useDispatch();
+  const handleRemove = id => {
+    dispatch(contactsOperations.contactRemove(id));
+  };
+
   if (contacts.length === 0) return null;
   return (
     <ul>
-      {contacts.map(contact => (
-        <ContactItem {...contact} onRemove={onRemove} />
+      {contacts.map(({ id, name, number }) => (
+        <li className={styles.listItem} key={id}>
+          {name}: {number}{' '}
+          <button className={styles.btn} onClick={() => handleRemove(id)}>
+            Delete
+          </button>
+        </li>
       ))}
     </ul>
   );
-};
+}
 
 // ContactItem.propTypes = {
 //   id: PropTypes.string.isRequired,
@@ -60,19 +62,19 @@ const ContactList = ({ contacts, onRemove }) => {
 // const mapStateToProps = ({ contacts: { items, filter } }) => ({
 //   contacts: getVisibleContacts(items, filter),
 // });
-const mapStateToProps = state => ({
-  contacts: contactsSelectors.getVisibleContacts(state),
+// const mapStateToProps = state => ({
+//   contacts: contactsSelectors.getVisibleContacts(state),
 
-  // const visibleContacts = items.filter(({ name }) =>
-  //   name.toLowerCase.includes(filter.toLowerCase()),
-  // );
-  // const { items, filter } = state.contacts;
-  // return {
-  //   contacts: items.filter(({ name }) => name.includes(filter.toLowerCase())),
-  // };
-});
+// const visibleContacts = items.filter(({ name }) =>
+//   name.toLowerCase.includes(filter.toLowerCase()),
+// );
+// const { items, filter } = state.contacts;
+// return {
+//   contacts: items.filter(({ name }) => name.includes(filter.toLowerCase())),
+// };
+// });
 
-const mapDispatchToProps = dispatch => ({
-  onRemove: id => dispatch(contactsOperations.contactRemove(id)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
+// const mapDispatchToProps = dispatch => ({
+//   onRemove: id => dispatch(contactsOperations.contactRemove(id)),
+// });
+// export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
